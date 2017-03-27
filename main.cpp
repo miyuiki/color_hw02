@@ -13,39 +13,54 @@ double blueMean(BMP Img_In);
 double redSD(BMP Img_In,double m);
 double greenSD(BMP Img_In,double m);
 double blueSD(BMP Img_In,double m);
-string toBinary32( float inp_ );
+int transBMP(double dt,double ds,double mt,double ms,double p);
+void Image_color(BMP s,BMP t, const char *OutputName);
 int main(int argc, char** argv)
 {
-	char input[100];
-	cin >> input;
-	BMP Img[10];
-    Img.ReadFromFile(input); 
-    fstream fp;
-    fp.open("416.txt",ios::out);
-    fp <<fixed << setprecision(6) << redMean(Img) << endl;
-    fp << toBinary32(redMean(Img)) << endl;
-    fp <<fixed << setprecision(6) << greenMean(Img) << endl;
-    fp << toBinary32(greenMean(Img)) << endl;
-    fp <<fixed << setprecision(6) << blueMean(Img) << endl;
-    fp << toBinary32(blueMean(Img)) << endl;    
-    fp <<fixed << setprecision(6) << redSD(Img,redMean(Img)) << endl;
-    fp << toBinary32(redSD(Img,redMean(Img))) << endl;
-    fp <<fixed << setprecision(6) << greenSD(Img,greenMean(Img)) << endl;
-    fp << toBinary32(greenSD(Img,greenMean(Img))) << endl;
-    fp <<fixed << setprecision(6) << blueSD(Img,blueMean(Img)) << endl;
-    fp << toBinary32(blueSD(Img,blueMean(Img))) << endl;
+	BMP s1,s2,s3,s4;
+    BMP t1,t2,t3,t4;
+    
+    s1.ReadFromFile("s1.bmp"); 
+    s2.ReadFromFile("s2.bmp");
+    s3.ReadFromFile("s3.bmp");
+    s4.ReadFromFile("s4.bmp");
+    t1.ReadFromFile("t1.bmp");
+    t2.ReadFromFile("t2.bmp");
+    t3.ReadFromFile("t3.bmp");
+    t4.ReadFromFile("t4.bmp");
+    
+    Image_color(s1,t1,"r1.bmp");
+    Image_color(s2,t2,"r2.bmp");
+    Image_color(s3,t3,"r3.bmp");
+    Image_color(s4,t4,"r4.bmp");
     
 	return 0;
 }
-string toBinary32( float inp_ )
+int transBMP(double dt,double ds,double mt,double ms,double p){
+    return dt/ds*(p-ms)+mt;
+}
+void Image_color(BMP s,BMP t, const char *OutputName)
 {
-    union { 
-        float input;
-        int output;
-    } data ;
-    data.input = inp_;
-    bitset<sizeof(float) * CHAR_BIT> bits(data.output); 
-    return bits.to_string();
+    BMP Output;
+    Output.SetSize(s.TellWidth() ,s.TellHeight());
+    Output.SetBitDepth(24);
+
+    for(int i=0; i<s.TellHeight(); i++)
+    {
+        for(int j=0; j<s.TellWidth(); j++)
+        {
+            RGBApixel NewPixel = s.GetPixel(i, j);  //讀取單一個像素結構。P.S.也可以自行改成先讀取成(R,G,B)陣列後，再做應用。 
+
+            //----------------------------在這部分做像素的修改--------------------------------//
+            NewPixel.Red = transBMP(redSD(t),redSD(s),redMean(t),redMean(s),);
+            NewPixel.Green = transBMP(greenSD(t),greenSD(s),greenMean(t),greenMean(s),);
+            NewPixel.Blue = transBMP(blueSD(t),blueSD(s),blueMean(t),blueMean(s),);
+            //----------------------------修改影像結束--------------------------------//
+
+            Output.SetPixel(i, j, NewPixel);  //儲存單一個像素結構
+        }
+    }
+    Output.WriteToFile(OutputName);  //儲存的圖檔名字
 }
 double redMean(BMP Img_In)
 {
