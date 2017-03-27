@@ -52,9 +52,9 @@ void Image_color(BMP s,BMP t, const char *OutputName)
             RGBApixel NewPixel = s.GetPixel(i, j);  //讀取單一個像素結構。P.S.也可以自行改成先讀取成(R,G,B)陣列後，再做應用。 
 
             //----------------------------在這部分做像素的修改--------------------------------//
-            NewPixel.Red = transBMP(redSD(t),redSD(s),redMean(t),redMean(s),);
-            NewPixel.Green = transBMP(greenSD(t),greenSD(s),greenMean(t),greenMean(s),);
-            NewPixel.Blue = transBMP(blueSD(t),blueSD(s),blueMean(t),blueMean(s),);
+            NewPixel.Red = transBMP(redSD(t,redMean(t)),redSD(s,redMean(s)),redMean(t),redMean(s),s.Red);
+            NewPixel.Green = transBMP(greenSD(t,greenMean(t)),greenSD(s,greenMean(s)),greenMean(t),greenMean(s),s.Green);
+            NewPixel.Blue = transBMP(blueSD(t,blueMean(t)),blueSD(s,blueMean(s)),blueMean(t),blueMean(s),s.Blue);
             //----------------------------修改影像結束--------------------------------//
 
             Output.SetPixel(i, j, NewPixel);  //儲存單一個像素結構
